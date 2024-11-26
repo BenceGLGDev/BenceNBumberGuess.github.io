@@ -28,34 +28,33 @@
     <div id="response"></div>
 
     <script>
-        document.getElementById('submitBtn').addEventListener('click', async function () {
-            const guessInput = document.getElementById('guess');
-            const guess = guessInput.value;
+        // Initialize the game
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
 
-            if (!guess) {
-                document.getElementById('response').innerText = 'Please enter a number!';
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            const guessInput = document.getElementById('guess');
+            const guess = parseInt(guessInput.value);
+
+            if (isNaN(guess)) {
+                document.getElementById('response').innerText = 'Please enter a valid number!';
                 return;
             }
 
-            try {
-                const response = await fetch('/guess', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ guess: guess }),
-                });
+            attempts++;
 
-                const result = await response.json();
-                document.getElementById('response').innerText = result.message;
-
-                if (result.message.includes('Correct')) {
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
-                }
-            } catch (error) {
-                document.getElementById('response').innerText = 'An error occurred. Please try again!';
+            if (guess < secretNumber) {
+                document.getElementById('response').innerText = 'Too low!';
+            } else if (guess > secretNumber) {
+                document.getElementById('response').innerText = 'Too high!';
+            } else {
+                document.getElementById('response').innerText = `Correct! You guessed it in ${attempts} attempts. The game will restart.`;
+                setTimeout(() => {
+                    secretNumber = Math.floor(Math.random() * 100) + 1; // Reset the game
+                    attempts = 0;
+                    document.getElementById('response').innerText = '';
+                    guessInput.value = '';
+                }, 3000);
             }
         });
     </script>
