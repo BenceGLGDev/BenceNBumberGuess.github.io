@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guessing Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        input, button {
+            font-size: 1.2rem;
+            margin: 5px;
+        }
+        #response {
+            margin-top: 20px;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Number Guessing Game</h1>
+    <p>Guess a number between 1 and 100</p>
+    <input type="number" id="guess" placeholder="Enter your guess" />
+    <button onclick="submitGuess()">Submit</button>
+    <div id="response"></div>
+
+    <script>
+        async function submitGuess() {
+            const guess = document.getElementById('guess').value;
+            if (!guess) {
+                document.getElementById('response').innerText = 'Please enter a number!';
+                return;
+            }
+
+            const response = await fetch('/guess', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ guess: guess }),
+            });
+
+            const result = await response.json();
+            document.getElementById('response').innerText = result.message;
+
+            if (result.message.includes('Correct')) {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+</html>
