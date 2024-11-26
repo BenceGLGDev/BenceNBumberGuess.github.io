@@ -11,11 +11,18 @@ def index():
 
 @app.route('/guess', methods=['POST'])
 def guess():
-    user_guess = int(request.json.get('guess'))
+    data = request.get_json()
+    if not data or 'guess' not in data:
+        return jsonify({'message': 'Invalid input!'}), 400
+
+    try:
+        user_guess = int(data['guess'])
+    except ValueError:
+        return jsonify({'message': 'Please enter a valid number!'}), 400
+
+    # Retrieve or initialize session variables
     secret_number = session.get('number', None)
-    
-    # Start a new game if not already started
-    if not secret_number:
+    if secret_number is None:
         session['number'] = random.randint(1, 100)
         session['attempts'] = 0
         secret_number = session['number']
